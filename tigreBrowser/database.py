@@ -446,10 +446,13 @@ class Database:
             baseline = False
             diff = False
             if len(parts) > 1:
-                if parts[1] == 'baseline':
+                filterby = '_'.join(parts[:-1])
+                if parts[-1] == 'baseline':
                     baseline = True
-                elif parts[1] == 'diff':
+                elif parts[-1] == 'diff':
                     diff = True
+                else:
+                    filterby = name
             experiment_id = self.get_experiment_id(filterby, reg_id)
             q, a = self.__create_filter(filterby, criteria, experiment_id, baseline, diff)
             query.append(q)
