@@ -9,6 +9,20 @@ tigreBrowser is licensed under GNU Affero General Public License (AGPL3)
 tigreBrowser includes jQuery 1.4.2. (http://jquery.com/) licensed under MIT/GPL2 license
 tigreBrowser includes jQuery Dynamic Form 1.0.3. (http://code.google.com/p/jquery-dynamic-form/) licensed under GPL3 license
 
+
+Recent changes
+==============
+
+Version 1.0.2 (2011-09-20)
+- Fix a bug in handling '_' in experiment names
+
+Version 1.0.1 (2011-01-17)
+- Miscellaneous bugfixes.
+
+Version 1.0.0 (2010-10-08)
+- Initial release.
+
+
 Installation
 ============
 
