@@ -4,7 +4,7 @@ import os
 from distutils.core import setup
 from glob import glob
 
-README = open(os.path.join(os.path.dirname(__file__), 'README.txt')).read()
+README = open(os.path.join(os.path.dirname(__file__), 'README.md')).read()
 
 setup(name='tigreBrowser',
       version='1.0.3',
