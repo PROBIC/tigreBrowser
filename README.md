@@ -14,6 +14,10 @@ tigreBrowser includes jQuery Dynamic Form 1.0.3. (http://code.google.com/p/jquer
 Recent changes
 ==============
 
+Version 1.0.3 (2014-01-28)
+* File reorganisation to simplify database import from text files
+* Add new options to control UI complexity
+
 Version 1.0.2 (2011-09-20)
 * Fix a bug in handling '_' in experiment names
 
