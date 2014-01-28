@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 import sys
 from optparse import OptionParser, OptionGroup
-from gpsim_database import *
+from tigreBrowser.database_import import *
 
 def is_header_line(line, columns):
     try:
@@ -13,9 +13,9 @@ def is_header_line(line, columns):
         return True
 
 def main():
-    usage = "usage: %prog [options] database_file supplementary_data_name"
+    usage = "usage: %prog [options] database_file dataset_name"
     parser = OptionParser(usage)
-    group_supp = OptionGroup(parser, "Supplementary dataset annotation")
+    group_data = OptionGroup(parser, "Expression dataset annotation")
 
     parser.add_option('-f', '--file', dest='filename',
             help='read data from FILENAME instead of stdin')
@@ -24,18 +24,20 @@ def main():
     parser.add_option('-d', '--delimiter', dest='delimiter', type='string',
             action='store', help='column delimiter [default: whitespace]', default=None)
 
-    group_supp.add_option('-t', '--type', dest='type', type='int',
-            action='store', help='set data type (0=boolean, 1=integer, 2=float) [default: 0]', default=0)
-    group_supp.add_option('--tf', dest='tf', type='string',
-            action='store', help='set TF if this data depends on a TF')
-    group_supp.add_option('--source', dest='source', type='string',
-            action='store', help='set supplementary data source')
-    group_supp.add_option('--plaftorm', dest='platform', type='string',
-            action='store', help='set supplementary data platform')
-    group_supp.add_option('--desc', dest='desc', type='string',
-            action='store', help='set supplementary data desc')
+    group_data.add_option('--dataset-desc', dest='dataset_desc', type='string',
+            action='store', help='set dataset description')
+    group_data.add_option('--species', dest='dataset_species', type='string',
+            action='store', help='set dataset species')
+    group_data.add_option('--source', dest='dataset_source', type='string',
+            action='store', help='set dataset source')
+    group_data.add_option('--platform', dest='dataset_platform', type='string',
+            action='store', help='set dataset platform')
+    group_data.add_option('--save-location', dest='dataset_save_location', type='string',
+            action='store', help='set dataset save location')
+    group_data.add_option('--figure-filename', dest='dataset_figure_filename', type='string',
+            action='store', help='set dataset figure filename')
 
-    parser.add_option_group(group_supp)
+    parser.add_option_group(group_data)
 
     (options, args) = parser.parse_args()
 
@@ -44,10 +46,8 @@ def main():
         sys.exit()
 
     database_file = args[0]
-    name = args[1]
-    if not options.desc:
-        options.desc = name
-    annotation = [options.type, name, options.tf, options.source, options.platform, options.desc]
+    dataset_name = args[1]
+    dataset_annotation = [dataset_name, options.dataset_species, options.dataset_source, options.dataset_platform, options.dataset_desc, options.dataset_save_location, options.dataset_figure_filename]
 
     db = gpsim_database(database_file)
 
@@ -59,7 +59,7 @@ def main():
         print('Tables already exist')
 
     probe_names, data = get_data(options.filename, options.column - 1, options.delimiter)
-    db.add_supplementary_data(probe_names, data, annotation)
+    db.add_zscores(probe_names, data, dataset_annotation)
 
 def get_data(file, column, delim):
     probe_names = []

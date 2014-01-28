@@ -28,20 +28,28 @@ def print_form_dataset_selection(formdata):
     browser is in 'Target ranking' or 'Regulator ranking' mode.
     """
     print("<fieldset>")
-    print("<legend>Dataset selection</legend>")
-    print("""<p><label for="experiment_set">Experiment set:</label><br/>""")
-    print_select(formdata, 'experiment_set', [name for (name, id, parent) in EXPERIMENT_SETS])
-    print("</p>")
+    print("<legend>General</legend>")
+    if not SIMPLE_OPTIONS:
+        print("""<p><label for="experiment_set">Experiment set:</label><br/>""")
+        print_select(formdata, 'experiment_set', [name for (name, id, parent) in EXPERIMENT_SETS])
+        print("</p>")
 
-    if RANKING_TYPE == TARGET_RANKING:
-        print("""<p><label for="tf">TF:</label><br/>""")
-        print_select(formdata, 'tf', TFs)
-        print("</p>")
+        if RANKING_TYPE == TARGET_RANKING:
+            print("""<p><label for="tf">TF:</label><br/>""")
+            print_select(formdata, 'tf', TFs)
+            print("</p>")
+        else:
+            print("""<p><label for="target_set">Target set:</label><br/>""")
+            target_genes = db.get_gene_probe_names_dict(TARGET_SETS.values())
+            print_select(formdata, 'target_set', target_genes.values())
+            print("</p>")
     else:
-        print("""<p><label for="target_set">Target set:</label><br/>""")
-        target_genes = db.get_gene_probe_names_dict(TARGET_SETS.values())
-        print_select(formdata, 'target_set', target_genes.values())
-        print("</p>")
+        print_dummy_select(formdata, 'experiment_set', [name for (name, id, parent) in EXPERIMENT_SETS])
+        if RANKING_TYPE == TARGET_RANKING:
+            print_dummy_select(formdata, 'tf', TFs)
+        else:
+            target_genes = db.get_gene_probe_names_dict(TARGET_SETS.values())
+            print_dummy_select(formdata, 'target_set', target_genes.values())
 
     print("""<p><label for="numgenes">Number of genes per page:</label><br/>""")
     print_select(formdata, 'numgenes', NUMBERS, '50')
@@ -79,7 +87,7 @@ def print_form_search(formdata):
     """
     print("<fieldset>")
     print("<legend>Search</legend>")
-    print("""<p>Search for specific genes<br/>(for example: "twi, FBgn0011656, FBgn0045759"):</p>""")
+    print("""<p>Search for specific genes<br/>(for example: "ESR1, GREB1"):</p>""")
     print_input(formdata, 'search_query', '', 30)
     print("</fieldset>")
 
@@ -480,11 +488,15 @@ def parse_symbol(symbol):
 
 def parse_search_entry(search):
     """Parses the search string into a list of gene names or aliases.
-    Uses ',' (comma) as the delimiter.
+    Uses ',' (comma) as the delimiter if the string contains one,
+    if not then whitespace is used as delimiter.
 
     Returns: list of strings
     """
-    return [s.strip(' \t\n\"\'') for s in search.strip().split(',')]
+    if ',' in search:
+        return [s.strip(' \t\n\"\'') for s in search.strip().split(',')]
+    else:
+        return [s.strip(' \t\n\"\'') for s in search.strip().split()]
 
 def ensure_database_not_writable(database_file):
     """Checks whether the given file exists and whether it is writable.
@@ -651,7 +663,7 @@ along with this program.  If not, see &lt;<a href="http://www.gnu.org/licenses/"
 def read_config_file(config_file):
     """Reads browser configuration from the config file.
     """
-    global DATABASE_FILE, RANKING_TYPE
+    global DATABASE_FILE, RANKING_TYPE, INCLUDE_DIFFS, SIMPLE_OPTIONS, MASTER_ALIAS
     config = RawConfigParser()
     if not config.read(config_file):
         if not config.read('../' + config_file):
@@ -665,6 +677,11 @@ def read_config_file(config_file):
             RANKING_TYPE = REGULATOR_RANKING
         else:
             print_error_message("Config file: illegal ranking_type: '%s'<br/>Must be either 'target' or 'regulator'" % type, True)
+        inc_diffs = config.get('tigreBrowser', 'include_diffs').strip('\'\"')
+        INCLUDE_DIFFS = (inc_diffs.upper() == 'YES')
+        simple_opts = config.get('tigreBrowser', 'simple_options').strip('\'\"')
+        SIMPLE_OPTIONS = (simple_opts.upper() == 'YES')
+        MASTER_ALIAS = config.get('tigreBrowser', 'master_alias').strip('\'\"')
     except (Exception,):
         e = sys.exc_info()[1] # Python >3.0 compatibility
         print_error_message(e, True)
@@ -673,7 +690,7 @@ def read_environment_config():
     """Reads environment variables RESULT_BROWSER_DATABASE to get the database
     filename and RESULT_BROWSER_RANKING_TYPE to get the ranking type.
     """
-    global DATABASE_FILE, RANKING_TYPE
+    global DATABASE_FILE, RANKING_TYPE, INCLUDE_DIFFS, SIMPLE_OPTIONS
     if 'RESULT_BROWSER_DATABASE' in os.environ:
         DATABASE_FILE = os.environ['RESULT_BROWSER_DATABASE']
     if 'RESULT_BROWSER_RANKING_TYPE' in os.environ:
@@ -724,6 +741,9 @@ TARGET_RANKING = 2
 CONFIG_FILE = "tigreBrowser.cfg"
 DATABASE_FILE = None
 RANKING_TYPE = None
+INCLUDE_DIFFS = None
+SIMPLE_OPTIONS = None
+MASTER_ALIAS = None
 
 read_config_file(CONFIG_FILE)
 read_environment_config()
@@ -749,7 +769,8 @@ if 'show_about' in form:
 SUPP_ANNOTATIONS = db.get_supplementary_annotations()
 SUPP_ANNOTATION_COLORS = generate_colors(SUPP_ANNOTATIONS)
 SORT_TYPES = db.get_experiment_names()
-SORT_TYPES += [type + "_diff" for type in SORT_TYPES]
+if INCLUDE_DIFFS:
+    SORT_TYPES += [type + "_diff" for type in SORT_TYPES]
 FILTER_TYPES = SORT_TYPES
 FILTER_TYPES.append('zscore')
 EXPERIMENT_SETS = db.get_experiment_sets()
@@ -761,9 +782,9 @@ req = cgi.parse_qs(query_string)
 RANKING_TYPE = check_ranking_type(TFs, TARGET_SETS, RANKING_TYPE)
 
 if RANKING_TYPE == TARGET_RANKING:
-    title = 'tigreBrowser: Target ranking'
+    title = 'tigreBrowser: Ranking'
 elif RANKING_TYPE == REGULATOR_RANKING:
-    title = 'tigreBrowser: Regulator ranking'
+    title = 'tigreBrowser: Ranking'
 else:
     print_error_message("'ranking_type' must be either 'regulator' or 'target'", True)
 
@@ -827,7 +848,11 @@ if ('tf' in form or 'target_set' in form) and ('numgenes' in form and 'sort_type
 
     print("""<div id=gene_namelist>""")
     print("<p>Gene name list:<br/>")
-    print_genes([browser_results.get_probe_name(id) for id in gene_ids])
+    if MASTER_ALIAS:
+        print_genes([browser_results.get_probe_name(id) for id in gene_ids],
+                    [browser_results.get_aliases(id).get(MASTER_ALIAS, [''])[0] for id in gene_ids])
+    else:
+        print_genes([browser_results.get_probe_name(id) for id in gene_ids])
     print("</div>")
 else:
     print_form_with_divs(form)

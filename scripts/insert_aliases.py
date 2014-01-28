@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 import sys
 from optparse import OptionParser, OptionGroup
-from gpsim_database import *
+from tigreBrowser.database_import import *
 
 def main():
     usage = "usage: %prog [options] database_file alias_class dataset_name"

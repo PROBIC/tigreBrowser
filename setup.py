@@ -7,7 +7,7 @@ from glob import glob
 README = open(os.path.join(os.path.dirname(__file__), 'README.txt')).read()
 
 setup(name='tigreBrowser',
-      version='1.0.2',
+      version='1.0.3',
       license='AGPL3',
       author='Miika-Petteri Matikainen',
       author_email='mimatika@cc.hut.fi',
@@ -16,7 +16,10 @@ setup(name='tigreBrowser',
       url='http://users.ics.tkk.fi/ahonkela/tigre/',
       description='Gene expression model browser for results from tigre R package (http://www.bioconductor.org/packages/release/bioc/html/tigre.html)',
       long_description=README,
-      scripts=['tigreServer.py'],
+      scripts=['scripts/tigreServer.py', 'scripts/insert_aliases.py',
+               'scripts/insert_figures.py', 'scripts/insert_results.py',
+               'scripts/insert_supplementary_data.py',
+               'scripts/insert_zscores.py'],
       packages=['tigreBrowser'],
       data_files=[('share/tigreBrowser', glob('tigreBrowser/*.js') + glob('tigreBrowser/tigreBrowser.*') + ['tigreBrowser/imagehelper.cgi', 'database.sqlite'])],
       classifiers=[

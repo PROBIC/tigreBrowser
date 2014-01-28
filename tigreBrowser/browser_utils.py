@@ -99,7 +99,7 @@ def print_input(formdata, key, default, size="4"):
     else:
         print("""<INPUT type="text" name="%s" value="%s" size="%s"/>""" % (key, default, str(size)))
 
-def print_genes(genes):
+def print_genes(genes, aliases):
     """Prints gene names as tables.
     """
     print("""<table class="stats"><tr><td>""")

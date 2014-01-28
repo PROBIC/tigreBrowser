@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 import sys
 from optparse import OptionParser, OptionGroup
-from gpsim_database import *
+from tigreBrowser.database_import import *
 from datetime import date
 
 def main():
