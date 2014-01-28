@@ -34,7 +34,16 @@ def start_server(port, browser_dir):
             returns true for is_cgi(), the file is executable and the file
             extension of the file is .cgi.
             """
-            if CGIHTTPRequestHandler.is_cgi(self):
+            path = self.path
+            match = False
+
+            for x in self.cgi_directories:
+                i = len(x)
+                if path[:i] == x and (not path[i:] or path[i] == '/'):
+                    self.cgi_info = path[:i], path[i+1:]
+                    match = True
+
+            if match:
                 name = self.path.split('?', 2)[0]
                 file = self.translate_path(name)
                 if not self.is_executable(file):
