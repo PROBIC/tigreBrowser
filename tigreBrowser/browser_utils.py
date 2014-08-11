@@ -81,6 +81,17 @@ def print_select(formdata, key, values, default=None):
                 print("<OPTION>%s</OPTION>" % k)
     print("""</SELECT>""")
 
+def print_dummy_select(formdata, key, values, default=None):
+    selected = values[0]
+    if key in formdata:
+        for k in values:
+            if formdata.getvalue(key) == k:
+                selected = k
+    else:
+        if default is not None:
+            selected = default
+    print("""<INPUT type="hidden" name="%s" value="%s">""" % (key, selected))
+
 def print_checkbox(formdata, key, clicked=False):
     if key in formdata or clicked:
         print("""<INPUT type="checkbox" name="%s" id="%s" checked value="yes"/>""" % (key, key))
@@ -99,10 +110,14 @@ def print_input(formdata, key, default, size="4"):
     else:
         print("""<INPUT type="text" name="%s" value="%s" size="%s"/>""" % (key, default, str(size)))
 
-def print_genes(genes, aliases):
+def print_genes(genes, aliases=None):
     """Prints gene names as tables.
     """
     print("""<table class="stats"><tr><td>""")
+    if aliases is not None:
+        for alias in aliases:
+            print(alias + "<br/>")
+        print("</td><td>")
     for gene in genes:
         print(gene + "<br/>")
     print("</td><td>")
