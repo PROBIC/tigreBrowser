@@ -48,7 +48,6 @@ def print_headers(title, filter_count=20, filters_data=""):
 <html>
 <head>
   <title>%s</title>
-  <link rel="stylesheet" type="text/css" href="http://www.cis.hut.fi/style/2005/cis.css"/>
   <link rel="stylesheet" type="text/css" href="tigreBrowser.css"/>
   <script type="text/javascript" src="jquery-1.4.2.min.js"></script>
   <script type="text/javascript" src="jquery-dynamic-form.js"></script>

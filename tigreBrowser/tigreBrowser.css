@@ -1,3 +1,59 @@
+/* copy from cis.css begins */
+body {
+  margin-top: 0;
+  margin-left: 0;
+  margin-bottom: 0;
+  margin-right: 0;
+  padding-top: 0;
+  background-color: white;
+  font-family: sans-serif;
+  font-size: 11px;
+  line-height: 14px;
+  color: black;
+}
+
+h1 {
+  color: #111144;
+  font-size: 16pt;
+}
+
+h2 {
+  margin-top: 0.8em; /* Added */
+  color: #111144;
+  font-size: 14pt;
+}
+
+h3 {
+  color: #111144;
+  font-size: 13pt;
+}
+
+h4 {
+  color: #111144;
+  font-size: 12pt;
+}
+
+a:link {
+  color: #227ef6;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+a:visited {
+  color: #227ef6;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+a:link:hover,a:visited:hover {
+  color: #009E30;
+}
+
+td.leftcolumn  { padding: 0px 10px 0px 0px; }
+
+td.rightcolumn { padding: 0px 0px 0px 10px; }
+/* copy from cis.css ends */
+
 tr.highlight td {
 background-color: #6A9CFF;
 }

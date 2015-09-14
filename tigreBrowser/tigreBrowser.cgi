@@ -729,7 +729,7 @@ def print_form_with_divs(form, results=None):
 t0 = time.clock()
 form = cgi.FieldStorage()
 
-VERSION = "1.0"
+VERSION = "1.0.4"
 COLOR_LIST = ['E69F00', '56B4E9', '009E73', 'F0E442', '0072B2', 'D55E00', 'CC79A7', '000000']
 MAX_FILTER_COUNT = 20
 NUMBERS = ['5', '10', '20', '50', '100']
