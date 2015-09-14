@@ -629,8 +629,8 @@ def show_about(form, db):
     """Prints the about page of tigreBrowser.
     """
     print_headers("About tigreBrowser", MAX_FILTER_COUNT, "")
-    print("""<p>The <a href="https://github.com/ahonkela/tigreBrowser/">tigreBrowser software</a>
-powering this site is Copyright (C) 2010-2014 Miika-Petteri Matikainen,
+    print("""<p>The <a href="https://github.com/PROBIC/tigreBrowser/">tigreBrowser software</a>
+powering this site is Copyright (C) 2010-2015 Miika-Petteri Matikainen,
 Antti Honkela and Aalto University</p>""")
     l = []
     l.append(("tigreBrowser version", VERSION))
