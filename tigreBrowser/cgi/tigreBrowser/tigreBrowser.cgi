@@ -7,6 +7,7 @@ import math
 import time
 import sys
 import platform
+import pkg_resources
 from tigreBrowser import results
 from tigreBrowser.browser_utils import *
 from tigreBrowser.database import *
@@ -18,9 +19,6 @@ try: # Python >=3.0
 except ImportError: # Python <3.0
     import urllib
     from ConfigParser import RawConfigParser
-
-# Change the CWD to find the config file from the correct directory
-os.chdir(sys.path[0])
 
 def print_form_dataset_selection(formdata):
     """Prints dataset selection part of the form.
@@ -666,7 +664,7 @@ def read_config_file(config_file):
     global DATABASE_FILE, RANKING_TYPE, INCLUDE_DIFFS, SIMPLE_OPTIONS, MASTER_ALIAS
     config = RawConfigParser()
     if not config.read(config_file):
-        if not config.read('../' + config_file):
+        if not config.read(DEFAULT_CONFIG_FILE):
             print_error_message("Config file '%s' not found" % config_file, True)
     try:
         DATABASE_FILE = config.get('tigreBrowser', 'database').strip('\'\"')
@@ -738,6 +736,7 @@ PARAMETER_INDEX_THRESHOLD = 10
 SCRIPT_URI = os.getenv("SCRIPT_URI") or ""
 REGULATOR_RANKING = 1
 TARGET_RANKING = 2
+DEFAULT_CONFIG_FILE = pkg_resources.resource_filename('tigreBrowser', 'cgi/tigreBrowser/tigreBrowser.cfg')
 CONFIG_FILE = "tigreBrowser.cfg"
 DATABASE_FILE = None
 RANKING_TYPE = None
@@ -745,7 +744,10 @@ INCLUDE_DIFFS = None
 SIMPLE_OPTIONS = None
 MASTER_ALIAS = None
 
-read_config_file(CONFIG_FILE)
+if "TIGREBROWSER_CONFIG" in os.environ:
+    read_config_file(os.environ["TIGREBROWSER_CONFIG"])
+else:
+    read_config_file(os.path.join(os.path[0], CONFIG_FILE))
 read_environment_config()
 ensure_database_not_writable(DATABASE_FILE)
 

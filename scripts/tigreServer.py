@@ -4,6 +4,7 @@ import os
 import webbrowser
 from optparse import OptionParser, OptionGroup
 from threading import Thread
+import pkg_resources
 
 try: # Python >=3.0
     from configparser import RawConfigParser
@@ -20,15 +21,18 @@ except ImportError: # Python <3.0
     from tkMessageBox import *
 
 # Config file for server
-CONFIG_FILE = 'share/tigreBrowser/tigreBrowser.cfg'
+CONFIG_FILE = 'tigreBrowser.cfg'
+DEFAULT_CONFIG_FILE = pkg_resources.resource_filename('tigreBrowser', 'cgi/tigreBrowser/tigreBrowser.cfg')
+CGI_DIR = pkg_resources.resource_filename('tigreBrowser', 'cgi')
+BROWSER_DIR = '/tigreBrowser'
 
-def start_server(port, browser_dir):
+def start_server(port):
     """Starts a CGI HTTP server at the given port.
-    CGI scripts (.cgi file extension) are executed in the browser_dir
+    CGI scripts (.cgi file extension) are executed in the BROWSER_DIR
     directory.
     """
     class Handler(CGIHTTPRequestHandler):
-        cgi_directories = [browser_dir]
+        cgi_directories = [BROWSER_DIR]
         def is_cgi(self):
             """The pathname is considered a CGI file if the CGIHTTPRequestHandler
             returns true for is_cgi(), the file is executable and the file
@@ -53,8 +57,9 @@ def start_server(port, browser_dir):
                 return True
             return False
 
+    os.chdir(CGI_DIR)
     httpd = HTTPServer(("", port), Handler)
-    print("Result browser running on http://localhost:" + str(port) + "/" + browser_dir.strip('/') + "/tigreBrowser.cgi")
+    print("Result browser running on http://localhost:" + str(port) + "/" + BROWSER_DIR.strip('/') + "/tigreBrowser.cgi")
 
     try:
         httpd.serve_forever()
@@ -63,21 +68,20 @@ def start_server(port, browser_dir):
 
 def read_config_file(config_file):
     """Reads the config file.
-    Returns port setting and browser_dir setting from the config file.
+    Returns port setting from the config file.
     """
     config = RawConfigParser()
     if not config.read(config_file):
         print("Could not find config file '%s'" % config_file)
-        return 9999, '/tigreBrowser'
+        return 9999
 
     try:
         port = config.getint('server', 'port')
-        browser_dir = config.get('server', 'browser_dir').strip('\'\"')
     except (Exception,):
         e = sys.exc_info()[1]
         print("Error in config file: %s" % e)
         sys.exit(1)
-    return port, browser_dir
+    return port
 
 def read_commandline_options(config_file):
     """Reads command-line options.
@@ -126,7 +130,7 @@ class TigreBrowser(Frame):
     Creates a window with database file selection and controls to start
     or stop the server.
     """
-    def __init__(self, port, browser_dir, master=None):
+    def __init__(self, port, master=None):
         """Creates a new window.
         """
         Frame.__init__(self, master)
@@ -134,7 +138,6 @@ class TigreBrowser(Frame):
         self.root.protocol("WM_DELETE_WINDOW", sys.exit)
         self.thread = None
         self.port = port
-        self.browser_dir = browser_dir
         self.pack()
         self.__create_widgets()
 
@@ -186,12 +189,12 @@ class TigreBrowser(Frame):
         Adds a label indicating the URL of tigreBrowser.
         """
         print("Starting server")
-        self.thread = Thread(target=start_server, args=(self.port, self.browser_dir))
+        self.thread = Thread(target=start_server, args=(self.port, ))
         self.thread.start()
         self.start.config(state=DISABLED)
         self.open.config(state=DISABLED)
         self.stop.config(state=NORMAL)
-        url = "http://localhost:" + str(port) + "/" + browser_dir.strip('/') + "/tigreBrowser.cgi"
+        url = "http://localhost:" + str(port) + "/" + BROWSER_DIR.strip('/') + "/tigreBrowser.cgi"
         l = Label(self, text="Result browser running on:")
         l.pack()
         button = Button(self, text=url, command=lambda: webbrowser.open(url), fg="blue", activeforeground="blue", bd=0, font=("Helvetica", 11, "underline"))
@@ -207,24 +210,26 @@ class TigreBrowser(Frame):
         self.open.config(state=NORMAL)
         sys.exit()
 
-def create_gui(port, browser_dir):
+def create_gui(port):
     """Creates and starts the server GUI.
     """
     root = Tk()
-    app = TigreBrowser(port, browser_dir, master=root)
+    app = TigreBrowser(port, master=root)
     root.title("TigreBrowser")
     app.mainloop()
     root.destroy
 
 if __name__ == "__main__":
-    os.chdir(sys.path[0])
-    os.chdir('../')
-    port_cfg, browser_dir = read_config_file(CONFIG_FILE)
-    port_cli, run_gui = read_commandline_options(CONFIG_FILE)
+    if os.path.isfile(CONFIG_FILE):
+        myconfig = CONFIG_FILE
+        os.environ['TIGREBROWSER_CONFIG'] = os.path.join(os.getcwd(), myconfig)
+    else:
+        myconfig = DEFAULT_CONFIG_FILE
+    port_cfg = read_config_file(myconfig)
+    port_cli, run_gui = read_commandline_options(myconfig)
     port = port_cli or port_cfg
 
     if run_gui:
-        create_gui(port, browser_dir)
+        create_gui(port)
     else:
-        start_server(port, browser_dir)
-
+        start_server(port)

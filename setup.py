@@ -1,18 +1,18 @@
 #!/usr/bin/env python
 
 import os
-from distutils.core import setup
+from setuptools import setup
 from glob import glob
 
 README = open(os.path.join(os.path.dirname(__file__), 'README.md')).read()
 
 setup(name='tigreBrowser',
-      version='1.0.4',
+      version='1.0.5',
       license='AGPL3',
       author='Miika-Petteri Matikainen',
       author_email='mimatika@cc.hut.fi',
       maintainer='Antti Honkela',
-      maintainer_email='antti.honkela@hiit.fi',
+      maintainer_email='antti.honkela@helsinki.fi',
       url='https://github.com/PROBIC/tigreBrowser/',
       description='Gene expression model browser for results from tigre R package (http://www.bioconductor.org/packages/release/bioc/html/tigre.html)',
       long_description=README,
@@ -21,7 +21,9 @@ setup(name='tigreBrowser',
                'scripts/insert_supplementary_data.py',
                'scripts/insert_zscores.py'],
       packages=['tigreBrowser'],
-      data_files=[('share/tigreBrowser', glob('tigreBrowser/*.js') + glob('tigreBrowser/tigreBrowser.*') + ['tigreBrowser/imagehelper.cgi', 'database.sqlite'])],
+      package_data={'tigreBrowser': ['cgi/tigreBrowser/*']},
+      data_files=[('share/tigreBrowser', ['database.sqlite'])],
+      install_requires=['setuptools'],
       classifiers=[
           'Environment :: Web Environment',
           'License :: OSI Approved :: GNU Affero General Public License v3',
