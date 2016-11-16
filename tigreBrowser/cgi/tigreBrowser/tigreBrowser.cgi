@@ -747,7 +747,7 @@ MASTER_ALIAS = None
 if "TIGREBROWSER_CONFIG" in os.environ:
     read_config_file(os.environ["TIGREBROWSER_CONFIG"])
 else:
-    read_config_file(os.path.join(os.path[0], CONFIG_FILE))
+    read_config_file(os.path.join(sys.path[0], CONFIG_FILE))
 read_environment_config()
 ensure_database_not_writable(DATABASE_FILE)
 
