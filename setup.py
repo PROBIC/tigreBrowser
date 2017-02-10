@@ -7,10 +7,9 @@ from glob import glob
 README = open(os.path.join(os.path.dirname(__file__), 'README.md')).read()
 
 setup(name='tigreBrowser',
-      version='1.0.5',
+      version='1.1',
       license='AGPL3',
       author='Miika-Petteri Matikainen',
-      author_email='mimatika@cc.hut.fi',
       maintainer='Antti Honkela',
       maintainer_email='antti.honkela@helsinki.fi',
       url='https://github.com/PROBIC/tigreBrowser/',
